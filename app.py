@@ -6,6 +6,7 @@ from supabase_utils import save_to_supabase, fetch_responses
 from fastapi import Request
 from serpapi import search
 from dotenv import load_dotenv
+import uvicorn
 import asyncio
 import os
 
@@ -67,6 +68,10 @@ async def invoke_model_async(question):
     result = await asyncio.to_thread(model.invoke, prompt_value)
     return result
 
+@app.get("/")
+async def root():
+    return {"message": "Hello, World!"}
+
 # Endpoint para processar perguntas
 @app.api_route("/chat", methods=["POST", "GET"])
 async def chat_endpoint(request: Request):
@@ -122,3 +127,9 @@ async def chat_endpoint(request: Request):
         
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+
+if __name__ == "__main__":
+    # Obtenha a porta a partir da variável de ambiente ou use uma porta padrão
+    port = int(os.environ.get("PORT", 8000))
+    # Inicie o servidor na interface 0.0.0.0
+    uvicorn.run(app, host="0.0.0.0", port=port)
