@@ -1,3 +1,3 @@
 # to run the API
 
-## uvicorn api-websearch:app --reload
+## uvicorn app:app --reload

@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 import asyncio
 import os
 
-
 # Carregar variáveis de ambiente
 load_dotenv()
 APIKEY = os.getenv("SERPAPIKEY")
@@ -100,6 +99,7 @@ async def chat_endpoint(request: Request):
             save_to_supabase(chat_request.question, result,  chat_request.company_id,)
 
             return {"response": result}
+        
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
@@ -122,57 +122,3 @@ async def chat_endpoint(request: Request):
         
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
-
-
-
-
-# @app.api_route("/chat", methods=["POST", "GET"])
-# async def chat_endpoint(request: ChatRequest):
-#     if request.method == "POST":
-#         try:
-#             question_lower = request.question.lower()
-#             company_id = request.company_id
-
-#             # Verificar se a pergunta contém a solicitação de pesquisa
-#             if "pesquise" in question_lower:
-#                 web_search_results = await search_web_serpapi(request.question)
-#                 return {"response": "Resultados da pesquisa na web", "search_results": web_search_results}
-
-#             # Invocar o modelo com contexto e pergunta
-#             result = await invoke_model_async(request.question)
-
-#             # Caso a resposta seja insatisfatória, podemos retornar uma resposta padrão
-#             if not result or "pesquise" in question_lower:
-#                 return {"response": result or "Desculpe, não consegui responder à sua pergunta."}
-
-#             print("Resposta do modelo:", result)
-
-#             save_to_supabase(request.question, request.company_id, result)
-
-#             return {"response": result}
-    
-#         except Exception as e:
-#             raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
-
-# Criar GET 
-
-# template = """
-# Você é o StockWise, um assistente de IA especializado em gerenciamento de estoque. Sua missão é ajudar empresas com controle de inventário, otimização de espaço, redução de custos e estratégias de ressuprimento.
-
-# - Respostas concisas e informativas.
-# - Priorize temas de estoque e estratégias de melhoria.
-# - Realize pesquisas externas quando necessário.
-
-# Exemplos:
-# 1. Como reduzir o excesso de estoque?
-#     Resposta: Use análises ABC, promoções para liberar produtos parados e ajuste de previsões de demanda.
-
-# 2. O que é o ponto de pedido?
-#     Resposta: O ponto de pedido é o estoque no qual um novo pedido deve ser feito, calculado com base na demanda média e tempo de reposição.
-
-# Histórico: {context}
-
-# Pergunta: {question}
-
-# Resposta:
-# """
