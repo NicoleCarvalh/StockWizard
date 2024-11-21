@@ -10,7 +10,6 @@ import uvicorn
 import asyncio
 import os
 
-# Carregar variáveis de ambiente
 load_dotenv()
 APIKEY = os.getenv("SERPAPIKEY")
 
@@ -27,7 +26,7 @@ model = OllamaLLM(model="llama3.2:1b")
 prompt = ChatPromptTemplate.from_template(template)
 chain = prompt | model
 
-# Função para realizar pesquisas na web usando SerpAPI (assíncrona)
+# SerpAPI 
 async def search_web_serpapi(query: str):
     try:
         params = {
@@ -37,7 +36,7 @@ async def search_web_serpapi(query: str):
         }
         results = await asyncio.to_thread(search, params)
         
-        # Filtra os 7 primeiros resultados orgânicos
+        # 7 primeiros resultados
         if results and "organic_results" in results:
             filtered_results = [
                 {
@@ -57,12 +56,12 @@ async def search_web_serpapi(query: str):
 # Criação do app FastAPI
 app = FastAPI()
 
-# Estrutura para os dados de entrada
+# Estrutura dados de entrada
 class ChatRequest(BaseModel):
     question: str
     company_id: str
 
-# Função assíncrona para invocar o modelo
+# Invocar o modelo
 async def invoke_model_async(question):
     prompt_value = prompt.format(question=question)
     result = await asyncio.to_thread(model.invoke, prompt_value)
@@ -77,10 +76,10 @@ async def root():
 async def chat_endpoint(request: Request):
     if request.method == "POST":
         try:
-            # Obter o corpo da requisição como um dicionário
+            # Corpo da requisição como um dicionário
             body = await request.json()
             
-            # Criar uma instância de ChatRequest a partir do corpo da requisição
+            # Instância de ChatRequest a partir do corpo da requisição
             chat_request = ChatRequest(**body)
             
             question_lower = chat_request.question.lower()
@@ -94,7 +93,7 @@ async def chat_endpoint(request: Request):
             # Invocar o modelo com contexto e pergunta
             result = await invoke_model_async(chat_request.question)
 
-            # Caso a resposta seja insatisfatória, podemos retornar uma resposta padrão
+            # Resposta padrão para resultados insatisfatórios
             if not result:
                 return {"response": result or "Desculpe, não consegui responder à sua pergunta."}
 
@@ -120,18 +119,11 @@ async def chat_endpoint(request: Request):
             # Buscar as respostas no Supabase
             responses = fetch_responses(company_id)
             
-            # Caso haja um erro na busca, levantamos uma exceção
             if "error" in responses:
                 raise HTTPException(status_code=404, detail=responses["error"])
 
-            # Retornar as respostas formatadas
             return {"responses": responses}
         
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
-if __name__ == "__main__":
-    # Obtenha a porta a partir da variável de ambiente ou use uma porta padrão
-    port = int(os.environ.get("PORT", 8000))
-    # Inicie o servidor na interface 0.0.0.0
-    uvicorn.run(app, host="0.0.0.0", port=port)

@@ -1,7 +1,6 @@
 from supabase import create_client, Client
 import os
 
-# Configuração do Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
@@ -15,10 +14,10 @@ def save_to_supabase(question: str, answer: str, company_id: str):
             "companyId": company_id
         }
         result = supabase.table("chat").insert(data).execute()
-        if result.status_code == 201:
+        if result.data:
             print("Resposta salva com sucesso no Supabase!")
         else:
-            print(f"Erro ao salvar: {result}")
+            print(f"Erro ao salvar: {result.error}")
     except Exception as e:
         print(f"Erro ao conectar ao Supabase: {e}")
 
@@ -28,8 +27,7 @@ def fetch_responses(company_id: str):
         # Filtrar as respostas pelo ID da empresa
         result = supabase.table("chat").select("*").eq("companyId", company_id).execute()
 
-        # Verificar se a consulta foi bem-sucedida e se há dados retornados
-        if result.data:  # Verifica se há dados no retorno
+        if result.data:
             return result.data
         else:
             return {"error": "Nenhum dado encontrado."}
