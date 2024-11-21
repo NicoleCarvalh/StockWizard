@@ -105,6 +105,8 @@ async def chat_endpoint(request: Request):
 
             return {"response": result}
         
+        except ValueError as ve:
+            raise HTTPException(status_code=400, detail=f"Erro ao processar JSON: {str(ve)}")
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
