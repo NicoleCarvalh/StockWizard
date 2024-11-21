@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: stockwizard-api
+    env: python
+    region: oregon  # Alterar conforme necessário
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app:app --host 0.0.0.0 --port 8000"
+    plan: free
+    envVars:
+      - key: PORT
+        value: "8000"

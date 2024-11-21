@@ -70,7 +70,7 @@ async def invoke_model_async(question):
 
 @app.get("/")
 async def root():
-    return {"message": "Hello, World!"}
+    return {"message": "Oi, gente!"}
 
 # Endpoint para processar perguntas
 @app.api_route("/chat", methods=["POST", "GET"])
