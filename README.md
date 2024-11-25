@@ -11,8 +11,8 @@ O **StockWizard** é um assistente de inteligência artificial integrado ao sist
 O StockWizard tem como objetivo facilitar a experiência do usuário com o **StockWise**, oferecendo suporte em diversas frentes:
 
 - **Respostas a perguntas naturais**: O usuário pode interagir com o assistente usando linguagem comum, sem necessidade de comandos técnicos.
-  
 - **Consultas específicas do sistema**: O assistente está integrado ao StockWise, permitindo responder perguntas sobre:
+
   - Status do inventário.
   - Relatórios de compras e vendas.
   - Movimentações de produtos e análise de desempenho.
@@ -27,7 +27,16 @@ O StockWizard foi desenvolvido com o objetivo de democratizar o acesso a ferrame
 
 Essa introdução visa apresentar o conceito e a utilidade do StockWizard de forma clara e objetiva, preparando o terreno para uma explicação mais detalhada ou demonstração prática.
 
+## Como rodar?
 
-## Para rodar a API
-
-uvicorn app:app --reload
+1. Faça o download do Ollama em https://ollama.com/
+2. Em seu terminal, rode o comando:
+   `ollama run llama3.2:1b`
+3. Clone este repositório em sua máquina
+   `https://github.com/NicoleCarvalh/StockWizard.git`
+4. Crie seu Ambiente Virutal:
+   `python -m venv .venv`
+5. Após ativar seu ambiente virtual, faça a instalação das bibliotecas:
+   `pip install -r requirements.txt`
+6. Para rodar a API, use o comando:
+   `uvicorn app:app --reload`
