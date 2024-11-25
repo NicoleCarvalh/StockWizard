@@ -40,3 +40,14 @@ Essa introdução visa apresentar o conceito e a utilidade do StockWizard de for
    `pip install -r requirements.txt`
 6. Para rodar a API, use o comando:
    `uvicorn app:app --reload`
+
+## Testar requisição com Postman
+
+1. Acessar Postman Desktop (ou com componente Postman Agent)
+2. Inserir a url com método POST: http://127.0.0.1:8000/chat
+3. Selecionar: Body > raw > JSON
+4. Inserir corpo da requisição conforme exemplo: `{
+  "question": "Como funciona o sistema StockWise?", 
+  "company_id": "12345"
+}`
+5. Ao enviar, após o tempo de requisição, o modelo retornará a resposta
