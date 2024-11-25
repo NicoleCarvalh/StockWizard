@@ -6,26 +6,23 @@
 
 O **StockWizard** é um assistente de inteligência artificial integrado ao sistema **StockWise**, projetado para otimizar o gerenciamento de estoque de micro e pequenos empreendedores. Ele utiliza processamento de linguagem natural para interagir de forma intuitiva, respondendo a perguntas tanto gerais quanto específicas relacionadas ao sistema.
 
-## Para que serve?
+---
+
+## Funcionalidades
 
 O StockWizard tem como objetivo facilitar a experiência do usuário com o **StockWise**, oferecendo suporte em diversas frentes:
 
 - **Respostas a perguntas naturais**: O usuário pode interagir com o assistente usando linguagem comum, sem necessidade de comandos técnicos.
-- **Consultas específicas do sistema**: O assistente está integrado ao StockWise, permitindo responder perguntas sobre:
-
-  - Status do inventário.
-  - Relatórios de compras e vendas.
-  - Movimentações de produtos e análise de desempenho.
-
-- **Pesquisa na web**: Quando necessário, o StockWizard pode buscar informações externas para complementar sua resposta, garantindo que o usuário tenha acesso às melhores práticas ou dados adicionais relevantes.
-
-## Objetivo do projeto
-
-O StockWizard foi desenvolvido com o objetivo de democratizar o acesso a ferramentas inteligentes de gerenciamento de estoque, tornando-as acessíveis e práticas para usuários de diferentes níveis de conhecimento técnico. Ele é mais do que um chatbot; é um aliado estratégico para otimizar processos e melhorar a performance do negócio.
+- **Consultas específicas do sistema**: O assistente está integrado ao StockWise, permitindo responder perguntas sobre o funcionamento do sistema, com base no documento do Manual do Usuário.
+- **Pesquisa na web**: O StockWizard retorna resultados da web com título, link e snippet de sistes a respeito do assunto solicitado.
 
 ---
 
-Essa introdução visa apresentar o conceito e a utilidade do StockWizard de forma clara e objetiva, preparando o terreno para uma explicação mais detalhada ou demonstração prática.
+## Objetivo do projeto
+
+O StockWizard foi desenvolvido com o objetivo de democratizar o acesso a ferramentas inteligentes de gerenciamento de estoque, de maneira acessível e prática, para usuários de diferentes níveis de conhecimento técnico. Ele é mais do que um chatbot, é um aliado estratégico para otimizar processos e melhorar a performance de seu estoque.
+
+---
 
 ## Como rodar?
 
@@ -40,6 +37,8 @@ Essa introdução visa apresentar o conceito e a utilidade do StockWizard de for
    `pip install -r requirements.txt`
 6. Para rodar a API, use o comando:
    `uvicorn app:app --reload`
+
+---
 
 ## Testar requisição com Postman
 
