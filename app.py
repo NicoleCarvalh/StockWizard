@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
@@ -6,7 +7,6 @@ from supabase_utils import save_to_supabase, fetch_responses
 from fastapi import Request
 from serpapi import search
 from dotenv import load_dotenv
-import uvicorn
 import asyncio
 import os
 
@@ -51,10 +51,18 @@ async def search_web_serpapi(query: str):
             return [{"title": "Nenhum resultado encontrado", "link": "", "snippet": ""}]
     except Exception as e:
         print(f"Erro ao realizar pesquisa: {e}")
-        return [{"title": "Erro ao realizar pesquisa", "link": "", "snippet": str(e)}]
+        return
 
 # Criação do app FastAPI
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "https://stockwise-self.vercel.app"],  # Permitir o frontend rodando no port 5173
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],  # Métodos permitidos
+    allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Origin"],  # Cabeçalhos permitidos
+)
 
 # Estrutura dados de entrada
 class ChatRequest(BaseModel):
@@ -72,58 +80,41 @@ async def root():
     return {"message": "Oi, gente!"}
 
 # Endpoint para processar perguntas
-@app.api_route("/chat", methods=["POST", "GET"])
-async def chat_endpoint(request: Request):
-    if request.method == "POST":
-        try:
-            # Corpo da requisição como um dicionário
-            body = await request.json()
-            
-            # Instância de ChatRequest a partir do corpo da requisição
-            chat_request = ChatRequest(**body)
-            
-            question_lower = chat_request.question.lower()
-            company_id = chat_request.company_id
+@app.post("/chat")
+async def post_chat(request: Request):
+    body = await request.json()
+    chat_request = ChatRequest(**body)
+    question_lower = chat_request.question.lower()
 
-            # Verificar se a pergunta contém a solicitação de pesquisa
-            if "pesquise" in question_lower:
-                web_search_results = await search_web_serpapi(chat_request.question)
-                return {"response": "Resultados da pesquisa na web", "search_results": web_search_results}
-
-            # Invocar o modelo com contexto e pergunta
-            result = await invoke_model_async(chat_request.question)
-
-            # Resposta padrão para resultados insatisfatórios
-            if not result:
-                return {"response": result or "Desculpe, não consegui responder à sua pergunta."}
-
-            print("Resposta do modelo:", result)
-
-            # Salvar no Supabase
-            save_to_supabase(chat_request.question, result,  chat_request.company_id,)
-
-            return {"response": result}
+    if "pesquise" in question_lower:
+        web_search_results = await search_web_serpapi(chat_request.question)
+    
+        # Transforma resultados da pesquisa web em string para salvar no bd
+        search_results_text = "\n".join(
+            f"{result['title']} - {result['link']}: {result['snippet']}"
+            for result in web_search_results
+        )
         
-        except ValueError as ve:
-            raise HTTPException(status_code=400, detail=f"Erro ao processar JSON: {str(ve)}")
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
-
-    elif request.method == "GET":
-        try:
-            # Obter o `company_id` da query string
-            company_id = request.query_params.get("company_id")
-            if not company_id:
-                raise HTTPException(status_code=400, detail="O campo 'company_id' é obrigatório.")
-
-            # Buscar as respostas no Supabase
-            responses = fetch_responses(company_id)
-            
-            if "error" in responses:
-                raise HTTPException(status_code=404, detail=responses["error"])
-
-            return {"responses": responses}
+        # Salvar no banco de dados
+        save_to_supabase(chat_request.question, search_results_text, chat_request.company_id)
         
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+        return {"response": web_search_results}
 
+    result = await invoke_model_async(chat_request.question)
+    if not result:
+        return {"response": result or "Desculpe, não consegui responder à sua pergunta."}
+
+    save_to_supabase(chat_request.question, result, chat_request.company_id)
+    return {"response": result}
+
+@app.get("/chat")
+async def get_chat(request: Request):
+    company_id = request.query_params.get("company_id")
+    if not company_id:
+        raise HTTPException(status_code=400, detail="O campo 'company_id' é obrigatório.")
+
+    responses = fetch_responses(company_id)
+    if "error" in responses:
+        raise HTTPException(status_code=404, detail=responses["error"])
+
+    return {"responses": responses}
